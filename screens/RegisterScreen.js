@@ -2,6 +2,8 @@ import React, { useLayoutEffect, useState } from "react";
 import { KeyboardAvoidingView } from "react-native";
 import { StyleSheet, View } from "react-native";
 import { Button, Input, Text } from "react-native-elements";
+import { auth } from "../firebase";
+
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -9,13 +11,17 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-        headerBackTitle:"Back to Login"
-    })
-  }, [navigation]);
-
-  const register = () => {};
+  const register = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+          authUser.user.updateProfile({
+              displayName: name,
+              photoURL: imageUrl
+          })
+      })
+      .catch((err) => alert(err));
+  };
   return (
     <KeyboardAvoidingView style={styles.container}>
       <Text h3 style={{ marginBottom: 50 }}>

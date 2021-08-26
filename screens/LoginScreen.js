@@ -1,13 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView } from "react-native";
 import { StyleSheet, Text, View } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
+import { auth } from "../firebase";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signIn = () => {};
+  useEffect(() => {
+    const unsubcribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        navigation.replace("Home");
+      }
+    });
+
+    return unsubcribe;
+  }, []);
+  const signIn = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((res) => {})
+      .catch((err) => alert(err));
+  };
   return (
     //
     <KeyboardAvoidingView style={styles.container}>
@@ -31,13 +46,16 @@ const LoginScreen = ({ navigation }) => {
           type="Password"
           value={password}
           onChangeText={(text) => setPassword(text)}
+          onSubmitEditing={signIn}
         />
       </View>
 
       <Button containerStyle={styles.button} onPress={signIn} title="Login" />
       <Button
         containerStyle={styles.button}
-        onPress={() => navigation.navigate("Register", {name: "Back to Login"})}
+        onPress={() =>
+          navigation.navigate("Register", { name: "Back to Login" })
+        }
         type="outline"
         title="Register"
       />
